@@ -5,8 +5,6 @@ from genF import *
 from genP import *
 
 import logging
-#logging.basicConfig(level=logging.INFO)
-#logger = logging.getLogger(__name__)
 
 
 class PRL:
@@ -63,7 +61,7 @@ class PRL:
 
     def fit(self, iterations=1000, verbose=False):
         if verbose:
-            logging.info("Starting training of PRL\n%s" %self)
+            logging.info("Starting training of %s" %self)
             logging.info("Matrix game initialization...")
 
         for j in xrange(self.n_cols):
@@ -76,9 +74,9 @@ class PRL:
 
         #iterative updates
         for t in xrange(iterations):
-            if verbose: logging.info("PRL iteration %d" %(t+1))
+            if verbose: logging.info("PRL iteration %d/%d" %(t+1, iterations))
             (P, Q, V) = self.solver.solve(self.M, self.n_rows, self.n_cols)
-            if verbose: logging.info("Value of the game: %.6f" %V)
+            if verbose: logging.info("Value of the game (current margin): %.6f" %V)
             if (t+1 < iterations):
                 for j in xrange(self.n_cols):
                     if Q[j] <= 0:

@@ -14,7 +14,7 @@ from evaluation import *
 
 import logging
 logging.basicConfig(level=logging.INFO,
-                    format="%(asctime)s - %(filename)s - %(message)s",
+                    format="[%(asctime)s] %(filename)s - %(message)s",
                     datefmt='%H:%M:%S-%d%m%y')
 
 def manage_options():
@@ -22,7 +22,7 @@ def manage_options():
 
     parser.add_option("-s", "--seed",           dest="seed",            default=42,      help="Pseudo-random seed for replicability", type="int")
     parser.add_option("-t", "--test_size",      dest="test_size",       default=.3,      help="Test set size in percentage [0,1]")
-    parser.add_option("-c", "--config_file",    dest="config_file",  default="config/config.json", help="Configuration file")
+    parser.add_option("-c", "--config_file",    dest="config_file",     default="../config/config.json", help="Configuration file")
     parser.add_option("-v", "--verbose",        dest="verbose",         default=False,   help="Verbose output", action="store_true")
 
     (options, args) = parser.parse_args()
@@ -83,6 +83,8 @@ with open(options['config_file'], "r") as f:
 prl = PRL(gen_pref_training, gen_feat, dim, budget, solver)
 prl.fit(iterations, options["verbose"])
 #
+
+print prl.get_best_features(k=10)
 
 #EVALUATION
 acc, conf = accuracy(prl, gen_pref_test)

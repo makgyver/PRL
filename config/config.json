@@ -1,9 +1,9 @@
 {
     "feat_gen" : "GenHPolyF",
-    "feat_gen_params" : [2],
+    "feat_gen_params" : [3],
     "pref_generator" : "macro",
     "columns_budget" : 1000,
-    "iterations" : 1,
+    "iterations" : 10,
     "solver" : "FictitiousPlay",
     "solver_params" : [1000000]
 }
