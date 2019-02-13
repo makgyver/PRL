@@ -10,7 +10,7 @@ from sklearn.preprocessing import MinMaxScaler
 from prl import PRL
 from genF import *
 from genP import *
-from evaluation import accuracy
+from evaluation import *
 
 def manage_options():
     parser = OptionParser(usage="usage: %prog [options] dataset_file", version="%prog 1.0")
@@ -80,7 +80,9 @@ prl.fit(iterations)
 #
 
 #EVALUATION
-acc, bacc, conf = accuracy(prl, gen_pref_test)
+acc, conf = accuracy(prl, gen_pref_test)
+bacc, _ = balanced_accuracy(prl, gen_pref_test, conf)
+
 print "Accuracy:", acc
 print "Balanced accuracy:", bacc
 print "Confusion matrix:\n", conf

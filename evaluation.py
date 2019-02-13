@@ -1,12 +1,11 @@
 import numpy as np
 
-def accuracy(prl, gen_pref_test):
+def confusion_matrix(prl, gen_pref_test):
     X = gen_pref_test.X
     y = gen_pref_test.y
 
     conf_mat = np.zeros((prl.dim, prl.dim), dtype=int)
 
-    acc = 0.
     N = gen_pref_test.n
     for i in range(N):
         x = X[i,:]
@@ -21,14 +20,26 @@ def accuracy(prl, gen_pref_test):
                         xn = prl.gen_pref.get_pref_value(p)[1][0]
                         sco[c] -= prl.Q[j]*prl.gen_feat.get_feat_value(f, xn)*prl.gen_feat.get_feat_value(f, x)
         y_max = np.argmax(sco)
-        acc += (y[i] == y_max)
         conf_mat[y[i], y_max] += 1
 
-    acc /= N
+    return conf_mat
+
+
+def accuracy(prl, gen_pref_test, conf_matrix=None):
+    if type(conf_matrix) != np.ndarray:
+        conf_matrix = confusion_matrix(prl, gen_pref_test)
+
+    acc = sum([float(conf_matrix[y,y]) for y in range(prl.dim)]) / sum(sum(conf_matrix))
+    return acc, conf_matrix
+
+
+def balanced_accuracy(prl, gen_pref_test, conf_matrix=None):
+    if type(conf_matrix) != np.ndarray:
+        conf_matrix = confusion_matrix(prl, gen_pref_test)
 
     bacc = 0.0
     for y in range(prl.dim):
-        bacc += float(conf_mat[y,y]) / sum(conf_mat[y,:])
+        bacc += float(conf_matrix[y,y]) / sum(conf_matrix[y,:])
     bacc /= prl.dim
 
-    return acc, bacc, conf_mat
+    return bacc, conf_matrix
