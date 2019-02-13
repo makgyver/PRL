@@ -12,6 +12,11 @@ from genF import *
 from genP import *
 from evaluation import *
 
+import logging
+logging.basicConfig(level=logging.INFO,
+                    format="%(asctime)s - %(filename)s - %(message)s",
+                    datefmt='%H:%M:%S-%d%m%y')
+
 def manage_options():
     parser = OptionParser(usage="usage: %prog [options] dataset_file", version="%prog 1.0")
 
@@ -31,7 +36,7 @@ def manage_options():
 
 #INPUT
 options = manage_options()
-print "Options:", options
+logging.info("Options: %s" %options)
 #
 
 #LOADING DATA
@@ -55,7 +60,7 @@ Xte = scaler.transform(Xte)
 #CONFIGURATION FILE
 with open(options['config_file'], "r") as f:
     data = json.load(f)
-    print "Configuration: ", data
+    logging.info("Configuration: %s" %data)
 
     genf_class = getattr(__import__("genF"), data['feat_gen'])
     gen_feat = genf_class(Xtr, *data['feat_gen_params'])
@@ -76,14 +81,16 @@ with open(options['config_file'], "r") as f:
 
 #PRL
 prl = PRL(gen_pref_training, gen_feat, dim, budget, solver)
-prl.fit(iterations)
+prl.fit(iterations, options["verbose"])
 #
 
 #EVALUATION
 acc, conf = accuracy(prl, gen_pref_test)
 bacc, _ = balanced_accuracy(prl, gen_pref_test, conf)
 
-print "Accuracy:", acc
-print "Balanced accuracy:", bacc
-print "Confusion matrix:\n", conf
+logging.info("Accuracy: %.2f" %acc)
+logging.info("Balanced accuracy: %.2f" %bacc)
+logging.info("Confusion matrix:\n%s" %conf)
 #
+
+logging.shutdown()

@@ -17,7 +17,7 @@ class GenP():
 
     def get_all_prefs(self):
         pass
-        
+
     #def getUniqueVals(self):
     #    return [list(set(self.X[:,i])) for i in range(self.X.shape[1])]
 
@@ -44,6 +44,9 @@ class GenMicroP(GenP):
                     lp.append(((i, yp), (j, yn)))
         return lp
 
+    def __repr__(self):
+        return "Macro preference generator"
+
 class GenMacroP(GenP):
 
     def __init__(self, X, y):
@@ -62,3 +65,6 @@ class GenMacroP(GenP):
             for yn in (self.labelset - set([yp])):
                 lp.append(((i, yp), (i, yn)))
         return lp
+
+    def __repr__(self):
+        return "Micro preference generator"

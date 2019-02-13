@@ -4,6 +4,11 @@ import numpy as np
 from genF import *
 from genP import *
 
+import logging
+#logging.basicConfig(level=logging.INFO)
+#logger = logging.getLogger(__name__)
+
+
 class PRL:
 
     def __init__(self, gen_pref, gen_feat, dim, n_cols, solver):
@@ -20,6 +25,10 @@ class PRL:
 
         self.M = np.zeros((self.n_rows, self.n_cols))
         self.Q = None
+
+    def __repr__(self):
+        return "PRL(gen_pref=%s, gen_feat=%s, n_rows=%d, n_cols=%d, solver=%s)"\
+            %(self.gen_pref, self.gen_feat, self.n_rows, self.n_cols, self.solver)
 
     def get_random_pair(self):
         return (self.gen_pref.get_random_pref(), self.gen_feat.get_random_feat())
@@ -52,8 +61,11 @@ class PRL:
         return (p, f), rp
 
 
-    def fit(self, iterations=1000):
-        #initialize matrix
+    def fit(self, iterations=1000, verbose=False):
+        if verbose:
+            logging.info("Starting training of PRL\n%s" %self)
+            logging.info("Matrix game initialization...")
+
         for j in xrange(self.n_cols):
             (p, f), rp = self._get_new_col()
             self.feat_list.append((p, f))
@@ -64,8 +76,9 @@ class PRL:
 
         #iterative updates
         for t in xrange(iterations):
+            if verbose: logging.info("PRL iteration %d" %(t+1))
             (P, Q, V) = self.solver.solve(self.M, self.n_rows, self.n_cols)
-            print V
+            if verbose: logging.info("Value of the game: %.6f" %V)
             if (t+1 < iterations):
                 for j in xrange(self.n_cols):
                     if Q[j] <= 0:
@@ -76,4 +89,14 @@ class PRL:
                         R = self.row_prefs_repr(f)
                         x = np.dot(R, rp)
                         self.M[:,j] = x
+            if verbose:
+                logging.info("# of kept columns: %d" %(np.sum(Q>0)))
+                logging.info("# of unique fetures: %d\n" %len(set([f for i, (p, f) in enumerate(self.feat_list) if Q[i]>0.])))
         self.Q = Q
+
+
+    def get_best_features(self, k=10):
+        list_w_feat = [(self.Q[i], pf) for i, pf in enumerate(self.feat_list) if self.Q[i] > 0]
+        list_w_feat.sort(reverse=True)
+
+        return [(pf, q) for (q, pf) in list_w_feat[:k]]

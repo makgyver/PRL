@@ -21,6 +21,9 @@ class FictitiousPlay(Solver):
     def __init__(self, iterations=1000000):
         self.iterations = iterations
 
+    def __repr__(self):
+        return "FictitiousPlay(it=%d)" %self.iterations
+
     def get_name(self):
         return "FP"
 

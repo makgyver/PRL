@@ -23,6 +23,9 @@ class GenLinF(GenF):
     def get_feat_value(self, fid, ex):
         return ex[fid]
 
+    def __repr__(self):
+        return "GenLinF(d=%d)" %(self.d)
+
 
 class GenHPolyF(GenF):
     def __init__(self, X, q):
@@ -37,6 +40,10 @@ class GenHPolyF(GenF):
         for i in range(self.q):
             v *= ex[fid[i]]
         return v
+
+    def __repr__(self):
+        return "GenHPolyF(d=%d, q=%d)" %(self.d, self.q)
+
 
 class GenDPKF(GenF):
     def __init__(self, X, q):
@@ -61,6 +68,9 @@ class GenDPKF(GenF):
         v *= w
         return v
 
+    def __repr__(self):
+        return "GenDPKF(d=%d, q=%d)" %(self.d, self.n_coeffs-1)
+
 
 class GenConjF(GenF):
     def __init__(self, X, q):
@@ -75,6 +85,9 @@ class GenConjF(GenF):
         for i in range(self.q):
             v *= ex[fid[i]]
         return v
+
+    def __repr__(self):
+        return "GenConjF(d=%d, q=%d)" %(self.d, self.q)
 
 
 class GenRuleF(GenF):
@@ -101,6 +114,9 @@ class GenRuleF(GenF):
             if (rel == '<=') and (ex[r] > t): return 0.0
         return 1.0
 
+    def __repr__(self):
+        return "GenRuleF(d=%d, q=%d, {>=, <=})" %(self.d, self.q)
+
 
 class GenRuleEqF(GenF):
     def __init__(self, X, q):
@@ -124,3 +140,6 @@ class GenRuleEqF(GenF):
             r, t, rel = f
             if (r < self.d) and (ex[r] != t): return 0.0
         return 1.0
+
+    def __repr__(self):
+        return "GenRuleF(d=%d, q=%d, {==})" %(self.d, self.q)
