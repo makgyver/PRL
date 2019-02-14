@@ -12,12 +12,18 @@ from genF import *
 from genP import *
 from evaluation import *
 
+#LOGGER SETUP
 import logging
 logging.basicConfig(level=logging.INFO,
                     format="[%(asctime)s] %(filename)s - %(message)s",
                     datefmt='%H:%M:%S-%d%m%y')
 
 def manage_options():
+    """Manages the options of the command line.
+
+    :returns: a dictionary containg the options and their associated values
+    :rtype: dictionary
+    """
     parser = OptionParser(usage="usage: %prog [options] dataset_file", version="%prog 1.0")
 
     parser.add_option("-s", "--seed",           dest="seed",            default=42,      help="Pseudo-random seed for replicability", type="int")
@@ -49,6 +55,7 @@ dim = len(unique_y)
 map_y = dict(zip(unique_y, range(len(unique_y))))
 y = np.array([map_y[i] for i in y])
 
+#TRAINING-TEST SET SPLIT
 Xtr, Xte, ytr, yte = train_test_split(X, y, test_size=options["test_size"], random_state=options["seed"])
 
 scaler = MinMaxScaler()
@@ -57,7 +64,7 @@ Xtr = scaler.transform(Xtr)
 Xte = scaler.transform(Xte)
 #
 
-#CONFIGURATION FILE
+#LOAD CONFIGURATION FILE
 with open(options['config_file'], "r") as f:
     data = json.load(f)
     logging.info("Configuration: %s" %data)
@@ -79,12 +86,10 @@ with open(options['config_file'], "r") as f:
     solver = solver_class(*data['solver_params'])
 #
 
-#PRL
+#TRAINING PRL
 prl = PRL(gen_pref_training, gen_feat, dim, budget, solver)
 prl.fit(iterations, options["verbose"])
 #
-
-print prl.get_best_features(k=10)
 
 #EVALUATION
 acc, conf = accuracy(prl, gen_pref_test)

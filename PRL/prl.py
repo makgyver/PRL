@@ -6,10 +6,33 @@ from genP import *
 
 import logging
 
+__docformat__ = 'reStructuredText'
 
 class PRL:
+    """This class implements the Preference and Rule Learning (PRL) algorithm.
+
+    The current implementation of PRL uses a fixed budget of columns and it is
+    designed for label ranking tasks (instance ranking is currently not supported).
+    PRL is described in the paper:
+    `'Interpretable preference learning: a game theoretic framework for large margin
+    on-line feature and rule learning' by M.Polato and F.Aiolli, AAAI 2019.
+    <https://arxiv.org/abs/1812.07895>`_.
+    """
 
     def __init__(self, gen_pref, gen_feat, dim, n_cols, solver):
+        """Initializes all the useful structures.
+
+        :param gen_pref: the preference generator. See <:genP.GenMacroP> and <:genP.GenMicroP>
+        :param gen_feat: the feature generator
+        :param dim: number of possible labels
+        :param n_cols: number of columns of the matrix sub-game
+        :param solver: game solver. See for example <:solvers.FictitiousPlay>
+        :type gen_pref: object of class which inherits from <:genP.GenP>, e.g., GenMacroP
+        :type gen_feat: object of class which inherits from <:genF.GenF>, e.g., GenHPolyF
+        :type dim: int
+        :type n_cols: int
+        :type solver: object of class which inherits from <:solvers.Solver>
+        """
         self.gen_pref = gen_pref
         self.gen_feat = gen_feat
         self.n_cols = n_cols
@@ -25,14 +48,33 @@ class PRL:
         self.Q = None
 
     def __repr__(self):
+        """Returns a string representation of the PRL object.
+
+        :returns: return a string representation of the PRL object
+        :rtype: string
+        """
         return "PRL(gen_pref=%s, gen_feat=%s, n_rows=%d, n_cols=%d, solver=%s)"\
             %(self.gen_pref, self.gen_feat, self.n_rows, self.n_cols, self.solver)
 
     def get_random_pair(self):
+        """Returns a new random columns composed by a preference-feature pair.
+
+        :returns:  a new random columns composed by a preference-feature pair
+        :rtype: tuple(preference, feature)
+        """
         return (self.gen_pref.get_random_pref(), self.gen_feat.get_random_feat())
 
 
     def col_pref_repr(self, q, f):
+        """Computes the representation of the preference q w.r.t. the feature f.
+
+        :param q: the new preference
+        :param f: the new feature
+        :type q: tuple
+        :type f: int, tuple
+        :returns: the representation of the preference q w.r.t. f.
+        :rtype: numpy.ndarray
+        """
         r = np.zeros(self.dim)
         (x_p, y_p), (x_n, y_n) = self.gen_pref.get_pref_value(q)
         r[y_p] = +self.gen_feat.get_feat_value(f, x_p)
@@ -41,6 +83,13 @@ class PRL:
 
 
     def row_prefs_repr(self, f):
+        """Computes the representation of all the preferences w.r.t. the selected feature f.
+
+        :param f: a feature
+        :type f: int, tuple
+        :returns: the representation of all the preferences w.r.t. f
+        :rtype: numpy.ndarray
+        """
         R = np.zeros((self.n_rows, self.dim))
         for i, q in enumerate(self.pref_list):
             (x_p, y_p), (x_n, y_n) = self.gen_pref.get_pref_value(q)
@@ -49,8 +98,12 @@ class PRL:
         return R
 
 
-    #TODO optimize this
     def _get_new_col(self):
+        """Internal method that randomly pick a new column in such a way that its representation is not null and it is not already in the game matrix.
+
+        :returns: a not null representation of a random picked preference-feature pair
+        :rtype: tuple
+        """
         (p, f) = self.get_random_pair()
         rp = self.col_pref_repr(p, f)
         while (p, f) in self.feat_set or not rp.any():
@@ -60,6 +113,13 @@ class PRL:
 
 
     def fit(self, iterations=1000, verbose=False):
+        """Trains the PRL method.
+
+        :param iterations: the number of iterations of PRL
+        :param verbose: whether the output is verbose or not
+        :type iterations: int
+        :type verbose: bool
+        """
         if verbose:
             logging.info("Starting training of %s" %self)
             logging.info("Matrix game initialization...")
@@ -94,6 +154,13 @@ class PRL:
 
 
     def get_best_features(self, k=10):
+        """Returns the k best features sorted by their weights.
+
+        :param k: the number of most relevant features to retrieve
+        :type k: int
+        :returns: the k best features (along with their weights) sorted by their weights
+        :rtype: list of tuples
+        """
         list_w_feat = [(self.Q[i], pf) for i, pf in enumerate(self.feat_list) if self.Q[i] > 0]
         list_w_feat.sort(reverse=True)
 

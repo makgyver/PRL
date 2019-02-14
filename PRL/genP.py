@@ -2,27 +2,54 @@ import numpy as np
 import random
 
 class GenP():
+    """Abstract class which representes a generic preference generator.
+    Every specific generator MUST inherit from this class."""
+
     def __init__(self, X, y):
+        """Initializes the preference generator.
+
+        :param X: training instances
+        :param y: training labels associated to the instances
+        :type X: bidimensional numpy.ndarray
+        :type y: numpy.ndarray
+        """
         self.X = X
         self.y = y
         self.n = X.shape[0]
         self.labelset = set(np.unique(y))
 
     def get_random_pref(self):
+        """Returns the identifier of random preference.
+
+        :returns: a random preference
+        :rtype: tuple
+        """
         pass
 
-    def get_pref_value(self,p):
+    def get_pref_value(self, p):
+        """Retruns the concrete instantiation of a prefernce identifier.
+
+        :param p: preference identifier
+        :type p: tuple
+        :returns: a preference
+        :rtype: tuple(tuple(numpy.ndarray, int), tuple(numpy.ndarray, int))
+        """
         (ipos, ypos), (ineg, yneg) = p
         return ((self.X[ipos], ypos), (self.X[ineg], yneg))
 
     def get_all_prefs(self):
-        pass
+        """Returns the list of all possibile preferences.
 
-    #def getUniqueVals(self):
-    #    return [list(set(self.X[:,i])) for i in range(self.X.shape[1])]
+        :returns: the list of all possible preferences
+        :rtype: list
+        """
+        pass
 
 
 class GenMicroP(GenP):
+    """Micro preference generator. A micro preference describes preferences like
+    (x_i, y_i) is preferred to (x_j, y_j), where (x_i, y_i) in X x Y, while  (x_j, y_j)
+    not in X x Y. This kind of preferences are suitable for instance ranking tasks."""
 
     def __init__(self, X, y):
         GenP.__init__(self, X, y)
@@ -48,6 +75,9 @@ class GenMicroP(GenP):
         return "Macro preference generator"
 
 class GenMacroP(GenP):
+    """Macro preference generator. A macro preference describes preferences like
+    y_i is preferred to y_j for the instance x_i, where (x_i, y_i) in X x Y, while (x_i, y_j)
+    not in X x Y. This kind of preferences are suitable for label ranking tasks."""
 
     def __init__(self, X, y):
         GenP.__init__(self, X, y)
