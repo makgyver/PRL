@@ -8,8 +8,10 @@ PRL has been presented @ AAAI 2019; the reference paper is:
 M. Polato and F. Aiolli, "[Interpretable preference learning: a game theoretic framework for large margin on-line feature and rule learning]", AAAI 2019.
 
 
-### Run PRL
+## How to use the PRL module
 It is possible to run PRL using the provided python script `run_prl.py`.
+
+### Configuration file
 In order to correctly run the script the configuration file must be initialized. An example of configuration file is provided in `config/config.json`
 
 ```json
@@ -44,9 +46,10 @@ The meaning of each configuration attribute is described in the following:
 * `solver`: the algorithm for solving the game. Up to now the only available algorithm is `FictitiousPlay`, but new algorithms are coming soon.
 * `solver_params`: it is the ordered list of parameters of the solver. For more details, please refer to the documentation of the solvers.
 
+### Run PRL
 Once the configuration file is ready, PRL can be trained and evaluated by using the provided script
 ```sh
-python run_prl [OPTIONS] dataset
+python run_prl.py [OPTIONS] dataset
 ```
 where `dataset` must be an svmlight file and the possible options are the following:
 * `-c CONFIG_FILE`, `--config_file CONFIG_FILE`: `CONFIG_FILE` specifies the path of the configuration file (default: `config/config.json`);
@@ -54,5 +57,14 @@ where `dataset` must be an svmlight file and the possible options are the follow
 * `-s SEED`, `--seed SEED`: ``SEED`` specifies the pseudo-random seed. Useful for replicability purposes (default: 42);
 * `-v`, `--verbose`: whether the output it is verbose or not;
 * `-h`, `--help`: shows the help.
+
+An example of run, using the configuration file as above, is:
+```sh
+python run_prl.py -t 0.2 -s 1 -v
+```
+which runs PRL using 80% of the dataset as training set and the rest as test set, using 1 as pseudo-random seed and a verbose output.
+
+### Evaluation
+The evaluation is computed in terms of *accuracy*, *balanced accuracy* and it also shows the *confusion matrix*.
 
 [Interpretable preference learning: a game theoretic framework for large margin on-line feature and rule learning]: <https://arxiv.org/abs/1812.07895>
