@@ -48,6 +48,11 @@ Once the configuration file is ready, PRL can be trained and evaluated by using 
 ```sh
 python run_prl [OPTIONS] dataset
 ```
-
+where `dataset` must be an svmlight file and the possible options are the following:
+* `-c CONFIG_FILE`, `--config_file CONFIG_FILE`: `CONFIG_FILE` specifies the path of the configuration file (default: `config/config.json`);
+* `-t SIZE`, `--test_size SIZE`: `SIZE` specifies the portion (in percentage, float between 0 and 1) of the dataset will be used as test set (default: 0.3);
+* `-s SEED`, `--seed SEED`: ``SEED`` specifies the pseudo-random seed. Useful for replicability purposes (default: 42);
+* `-v`, `--verbose`: whether the output it is verbose or not;
+* `-h`, `--help`: shows the help.
 
 [Interpretable preference learning: a game theoretic framework for large margin on-line feature and rule learning]: <https://arxiv.org/abs/1812.07895>
