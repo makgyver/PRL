@@ -43,7 +43,7 @@ The meaning of each configuration attribute is described in the following:
 
 * `columns_budget`: the number of columns of the matrix game;
 * `iterations`: number of iterations of PRL;
-* `solver`: the algorithm for solving the game. Up to now the only available algorithm is `FictitiousPlay`, but new algorithms are coming soon.
+* `solver`: the algorithm for solving the game. Up to now the only available algorithms are `FictitiousPlay` and `AMW`, but new algorithms are coming soon.
 * `solver_params`: it is the ordered list of parameters of the solver. For more details, please refer to the documentation of the solvers.
 
 ### Run PRL

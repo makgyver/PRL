@@ -47,12 +47,13 @@ class FictitiousPlay(Solver):
     """Fictitious Play (FP) algorithm for two-players zero-sum game.
 
     FP is an approximated solver, based on the algorithm described in
-    ``Iterative solutions of games by fictitious play``, G.W. Brown.ì, in Activity Analysis of Production and Allocation 374–376, 1951."""
+    ``Iterative solutions of games by fictitious play``, G.W. Brown, in Activity Analysis of Production and Allocation 374–376, 1951."""
 
     def __init__(self, iterations=1000000):
         """Initializes the Fictitious Play algorithm.
 
         :param iterations: number of iterations of the algorithm
+        :type iterations: int
         """
         self.iterations = iterations
 
@@ -95,7 +96,15 @@ class FictitiousPlay(Solver):
 
 
 class AMW(Solver):
+
     def __init__(self, iterations=1000, beta=0.):
+        """Initializes the AMW algorithm.
+
+        :param iterations: number of iterations of the algorithm
+        :type iterations: int
+        :param beta: 
+        :type beta: float
+        """
         self.iterations = iterations
         self.beta = beta
 
