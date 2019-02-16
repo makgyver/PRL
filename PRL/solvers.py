@@ -1,5 +1,5 @@
 import numpy as np
-
+import math
 
 class Solver():
     """Abstract class that every solver MUST inherit from."""
@@ -92,3 +92,51 @@ class FictitiousPlay(Solver):
         P /= np.sum(P)
         Q /= np.sum(Q)
         return (P, Q, np.dot(P.T, np.dot(M, Q)))
+
+
+class AMW(Solver):
+    def __init__(self, iterations=1000, beta=0.):
+        self.iterations = iterations
+        self.beta = beta
+
+    def __repr__(self):
+        return "AMW(it=%d, beta=%.2f)" %self.iterations
+
+    def get_name(self):
+        return "AMW"
+
+    def get_params(self):
+        return {"iterations" : self.iterations, "beta" : self.beta}
+
+    def set_params(self, params):
+        if "iterations" in params:
+            self.iterations = params["iterations"]
+        if "beta" in params:
+            self.beta = params["beta"]
+
+    def solve(self, M, n_rows, n_cols):
+        if not self.beta:
+            self.beta = 1.0 / (1.0 + math.sqrt(2*math.log(n_rows) / self.iterations))
+
+        P = np.ones(n_rows) / n_rows
+        PP = np.zeros(n_rows)
+        Q = np.zeros(n_cols)
+        V = 0.0
+
+        for t in xrange(self.iterations):
+            PP += P
+            q_eval = np.zeros(ncols)
+            for j in range(n_cols):
+                q_eval[j] = np.dot(P.T, self.M[j])
+            j_max = np.argmax(q_eval)
+            Q[j_max] += 1
+            V += q_eval[j_max]
+
+            for i in range(n_rows):
+                P[i] *= (self.beat**M[j_max][i])
+            P /= np.sum(P)
+
+        Q /=  np.sum(Q)
+        PP /= self.iterations
+        V /= self.iterations
+        return (PP, Q, V)
