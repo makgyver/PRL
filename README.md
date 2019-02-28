@@ -22,8 +22,8 @@ In order to correctly run the script the configuration file must be initialized.
     "pref_generator" : "macro",
     "columns_budget" : 1000,
     "iterations" : 10,
-    "solver" : "FictitiousPlay",
-    "solver_params" : [1000000]
+    "solver" : "LinProg",
+    "solver_params" : [0]
 }
 ```
 The meaning of each configuration attribute is described in the following:
