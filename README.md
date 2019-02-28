@@ -67,4 +67,19 @@ which runs PRL using 80% of the dataset as training set and the rest as test set
 ### Evaluation
 The evaluation is computed in terms of *accuracy*, *balanced accuracy* and it also shows the *confusion matrix*.
 
+### Version
+1.0b
+
+### Requirements
+PRL requires the following python modules:
+* [CVXOPT]
+* [Numpy]
+* [Scikit-learn]
+* [SciPy]
+
+
+[Scikit-learn]: <http://scikit-learn.org/stable/>
+[Numpy]: <http://www.numpy.org/>
+[CVXOPT]: <http://cvxopt.org/>
+[SciPy]: <https://www.scipy.org/>
 [Interpretable preference learning: a game theoretic framework for large margin on-line feature and rule learning]: <https://arxiv.org/abs/1812.07895>
