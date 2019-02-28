@@ -1,5 +1,9 @@
 import numpy as np
 import math
+from cvxopt import matrix, solvers
+
+__docformat__ = 'reStructuredText'
+
 
 class Solver():
     """Abstract class that every solver MUST inherit from."""
@@ -47,7 +51,7 @@ class FictitiousPlay(Solver):
     """Fictitious Play (FP) algorithm for two-players zero-sum game.
 
     FP is an approximated solver, based on the algorithm described in
-    ``Iterative solutions of games by fictitious play``, G.W. Brown, in Activity Analysis of Production and Allocation 374–376, 1951."""
+    'Iterative solutions of games by fictitious play', G.W. Brown, in Activity Analysis of Production and Allocation, pp. 374–376, 1951."""
 
     def __init__(self, iterations=1000000):
         """Initializes the Fictitious Play algorithm.
@@ -96,7 +100,8 @@ class FictitiousPlay(Solver):
 
 
 class AMW(Solver):
-
+    """TODO: documentation"""
+    
     def __init__(self, iterations=1000, beta=0.):
         """Initializes the AMW algorithm.
 
@@ -149,3 +154,66 @@ class AMW(Solver):
         PP /= self.iterations
         V /= self.iterations
         return (PP, Q, V)
+
+
+class LinProg(Solver):
+    """TODO: documentation"""
+    
+    def __init__(self, compute_p=False):
+        """Initializes the LinProg algorithm.
+
+        :param compute_p: whether to compute the strategy for the row player or not
+        :type compute_p: bool
+        """
+        self.compute_p = compute_p
+    
+    def __repr__(self):
+        return "LinProg(compute_p=%s)" %self.compute_p
+
+    def get_name(self):
+        return "LinProg"
+
+    def get_params(self):
+        return {"compute_p" : self.compute_p}
+
+    def set_params(self, params):
+        if "compute_p" in params:
+            self.compute_p = params["compute_p"]
+            
+    def solve(self, M, n_rows, n_cols):
+        c = matrix(0.0, (n_cols+1, 1))
+        c[n_cols, 0] = -1
+        
+        h = matrix(0.0, (n_rows+n_cols, 1))
+        
+        A = matrix(1.0, (1, n_cols+1))
+        A[0, -1] = 0
+        
+        b = matrix(1.)
+        
+        I = np.eye(n_cols, n_cols+1)
+        G = -np.concatenate((np.concatenate((M, -np.ones((n_rows, 1))), axis=1), I), axis=0)
+        G = matrix(G)
+        
+        sol = solvers.lp(c, G, h, A, b)
+        
+        V = sol['x'][-1]
+        Q = np.array(sol['x'].T)[0][:-1]
+
+        P = None
+        if self.compute_p:
+            c = matrix(0., (n_rows+1, 1))
+            c[-1, 0] = +1
+
+            A = matrix(1., (1, n_rows+1))
+            A[0, -1] = 0
+            
+            G = np.concatenate((np.concatenate((M.T, -np.ones((n_cols, 1))), axis=1), -I), axis=0)
+            G = matrix(G)
+            
+            sol = solvers.lp(c, G, h, A, b)
+
+            #V2 = sol['x'][-1]
+            P = np.array(sol['x'].T)[0][:-1]
+            
+        return (P, Q, V)
