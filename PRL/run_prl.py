@@ -7,7 +7,7 @@ from sklearn.datasets import load_svmlight_file
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import MinMaxScaler
 
-from prl import PRL
+from prl import *
 from genF import *
 from genP import *
 from evaluation import *
@@ -84,10 +84,12 @@ with open(options['config_file'], "r") as f:
 
     solver_class = getattr(__import__("solvers"), data['solver'])
     solver = solver_class(*data['solver_params'])
+    
+    prl_alg = getattr(__import__("prl"), data['algorithm'])
 #
 
 #TRAINING PRL
-prl = PRL(gen_pref_training, gen_feat, dim, budget, solver)
+prl = prl_alg(gen_pref_training, gen_feat, dim, budget, solver)
 prl.fit(iterations, options["verbose"])
 #
 

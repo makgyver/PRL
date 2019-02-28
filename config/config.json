@@ -1,9 +1,10 @@
 {
+    "algorithm": "PRL",
     "feat_gen" : "GenHPolyF",
     "feat_gen_params" : [3],
     "pref_generator" : "macro",
     "columns_budget" : 1000,
     "iterations" : 10,
-    "solver" : "FictitiousPlay",
-    "solver_params" : [1000000]
+    "solver" : "LinProg",
+    "solver_params" : [0]
 }

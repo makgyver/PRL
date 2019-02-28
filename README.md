@@ -16,6 +16,7 @@ In order to correctly run the script the configuration file must be initialized.
 
 ```json
 {
+    "algorithm" : "PRL",
     "feat_gen" : "GenHPolyF",
     "feat_gen_params" : [3],
     "pref_generator" : "macro",
@@ -26,6 +27,9 @@ In order to correctly run the script the configuration file must be initialized.
 }
 ```
 The meaning of each configuration attribute is described in the following:
+* `algorithm`: it selects the PRL variation. Actually two PRL variations are implemented:
+  * `PRL`: which is the standard algorithm as presented in the paper mentioned above;
+  * `PRL_ext`: that is slight different from PRL, in the sense that the budget of columns is not fixed, but at each iterations `columns_budget` number of new columns are generated. This variation guarantees that regardless of the initial budget at some iteration the number of columns will be enough to guarantee the convergence to the optimum (as the number of iterations increases).
 * `feat_gen`: it indicates which feature generator will be used by PRL. Feature generators are implemented in the script `genF.py` and at the moment the following feature generators scheme are implemented:
   * `GenLinF`: generates linear features, i.e., it randomly pick a feature from the input ones;
   * `GenHPolyF`: generates homogeneous polynomial features of the specified degree;
@@ -43,7 +47,7 @@ The meaning of each configuration attribute is described in the following:
 
 * `columns_budget`: the number of columns of the matrix game;
 * `iterations`: number of iterations of PRL;
-* `solver`: the algorithm for solving the game. Up to now the only available algorithms are `FictitiousPlay` and `AMW`, but new algorithms are coming soon.
+* `solver`: the algorithm for solving the game. Up to now the available algorithms are `FictitiousPlay`, `AMW` and `LinProg`.
 * `solver_params`: it is the ordered list of parameters of the solver. For more details, please refer to the documentation of the solvers.
 
 ### Run PRL
