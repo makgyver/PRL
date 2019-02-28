@@ -165,3 +165,59 @@ class PRL:
         list_w_feat.sort(reverse=True)
 
         return [(pf, q) for (q, pf) in list_w_feat[:k]]
+
+
+
+
+
+class PRL_ext(PRL):
+    
+    def fit(self, iterations=1000, verbose=False):
+
+        if verbose:
+            logging.info("Starting training of %s" %self)
+            logging.info("Matrix game initialization...")
+
+        for j in xrange(self.n_cols):
+            (p, f), rp = self._get_new_col()
+            self.feat_list.append((p, f))
+            self.feat_set.add((p, f))
+            R = self.row_prefs_repr(f)
+            x = np.dot(R, rp)
+            self.M[:,j] = x
+
+        #iterative updates
+        for t in xrange(iterations):
+            if verbose: logging.info("PRL_ext iteration %d/%d" %(t+1, iterations))
+            (P, Q, V) = self.solver.solve(self.M, self.n_rows, self.M.shape[1])
+            if verbose: logging.info("Value of the game (current margin): %.6f" %V)
+            if (t+1 < iterations):
+                for j in xrange(self.M.shape[1]):
+                    if Q[j] <= 0:
+                        (p, f), rp = self._get_new_col()
+                        self.feat_set.remove(self.feat_list[j])
+                        self.feat_list[j] = (p, f)
+                        self.feat_set.add((p, f))
+                        R = self.row_prefs_repr(f)
+                        x = np.dot(R, rp)
+                        self.M[:,j] = x
+                
+                n_zeros = np.sum(Q <= 0)
+                if n_zeros < self.n_cols:
+                    M_r = np.zeros((self.n_rows, self.n_cols-n_zeros))
+                    for j in xrange(self.n_cols-n_zeros):
+                        (p, f), rp = self._get_new_col()
+                        self.feat_list.append((p, f))
+                        self.feat_set.add((p, f))
+                        R = self.row_prefs_repr(f)
+                        x = np.dot(R, rp)
+                        M_r[:,j] = x
+                    
+                    self.M = np.concatenate((self.M, M_r), axis=1)
+                    
+            if verbose:
+                logging.info("# of kept columns: %d" %(np.sum(Q>0)))
+                logging.info("# of unique fetures: %d" %len(set([f for i, (p, f) in enumerate(self.feat_list[:len(Q)]) if Q[i]>0.])))
+                logging.info("# of columns: %d\n" %self.M.shape[1])
+                
+        self.Q = Q
