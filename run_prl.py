@@ -29,7 +29,7 @@ def manage_options():
 
 	parser.add_option("-s", "--seed",           dest="seed",            default=42,      help="Pseudo-random seed for replicability", type="int")
 	parser.add_option("-t", "--test_size",      dest="test_size",       default=.3,      help="Test set size in percentage [0,1]")
-	parser.add_option("-c", "--config_file",    dest="config_file",     default="../config/config.json", help="Configuration file")
+	parser.add_option("-c", "--config_file",    dest="config_file",     default="./config/config.json", help="Configuration file")
 	parser.add_option("-v", "--verbose",        dest="verbose",         default=False,   help="Verbose output", action="store_true")
 
 	(options, args) = parser.parse_args()
