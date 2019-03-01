@@ -86,7 +86,7 @@ class FictitiousPlay(Solver):
 
         Sq = M[i_min,:].copy()
 
-        for t in xrange(self.iterations):
+        for t in range(self.iterations):
             j_max = np.argmax(Sq / (t+1))
             Q[j_max] += 1.
             Sp += M[:,j_max]
@@ -137,7 +137,7 @@ class AMW(Solver):
         Q = np.zeros(n_cols)
         V = 0.0
 
-        for t in xrange(self.iterations):
+        for t in range(self.iterations):
             PP += P
             q_eval = np.zeros(ncols)
             for j in range(n_cols):

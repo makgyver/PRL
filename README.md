@@ -8,6 +8,18 @@ PRL has been presented @ AAAI 2019; the reference paper is:
 M. Polato and F. Aiolli, "[Interpretable preference learning: a game theoretic framework for large margin on-line feature and rule learning]", AAAI 2019.
 
 
+## Install PRL with Pypi (Python 3)
+PRL is available in the PyPi repository and it can be installed with
+```sh
+pip3 install prl
+```
+
+and then it can be imported in python with
+
+```python
+import prl
+```
+
 ## How to use the PRL module
 It is possible to run PRL using the provided python script `run_prl.py`.
 
@@ -72,7 +84,7 @@ which runs PRL using 80% of the dataset as training set and the rest as test set
 The evaluation is computed in terms of *accuracy*, *balanced accuracy* and it also shows the *confusion matrix*.
 
 ### Version
-1.0b
+0.94b
 
 ### Requirements
 PRL requires the following python modules:

@@ -1,8 +1,8 @@
 import math
 import numpy as np
 
-from genF import *
-from genP import *
+from .genF import *
+from .genP import *
 
 import logging
 
@@ -124,7 +124,7 @@ class PRL:
             logging.info("Starting training of %s" %self)
             logging.info("Matrix game initialization...")
 
-        for j in xrange(self.n_cols):
+        for j in range(self.n_cols):
             (p, f), rp = self._get_new_col()
             self.feat_list.append((p, f))
             self.feat_set.add((p, f))
@@ -133,12 +133,12 @@ class PRL:
             self.M[:,j] = x
 
         #iterative updates
-        for t in xrange(iterations):
+        for t in range(iterations):
             if verbose: logging.info("PRL iteration %d/%d" %(t+1, iterations))
             (P, Q, V) = self.solver.solve(self.M, self.n_rows, self.n_cols)
             if verbose: logging.info("Value of the game (current margin): %.6f" %V)
             if (t+1 < iterations):
-                for j in xrange(self.n_cols):
+                for j in range(self.n_cols):
                     if Q[j] <= 0:
                         (p, f), rp = self._get_new_col()
                         self.feat_set.remove(self.feat_list[j])
@@ -178,7 +178,7 @@ class PRL_ext(PRL):
             logging.info("Starting training of %s" %self)
             logging.info("Matrix game initialization...")
 
-        for j in xrange(self.n_cols):
+        for j in range(self.n_cols):
             (p, f), rp = self._get_new_col()
             self.feat_list.append((p, f))
             self.feat_set.add((p, f))
@@ -187,12 +187,12 @@ class PRL_ext(PRL):
             self.M[:,j] = x
 
         #iterative updates
-        for t in xrange(iterations):
+        for t in range(iterations):
             if verbose: logging.info("PRL_ext iteration %d/%d" %(t+1, iterations))
             (P, Q, V) = self.solver.solve(self.M, self.n_rows, self.M.shape[1])
             if verbose: logging.info("Value of the game (current margin): %.6f" %V)
             if (t+1 < iterations):
-                for j in xrange(self.M.shape[1]):
+                for j in range(self.M.shape[1]):
                     if Q[j] <= 0:
                         (p, f), rp = self._get_new_col()
                         self.feat_set.remove(self.feat_list[j])
@@ -205,7 +205,7 @@ class PRL_ext(PRL):
                 n_zeros = np.sum(Q <= 0)
                 if n_zeros < self.n_cols:
                     M_r = np.zeros((self.n_rows, self.n_cols-n_zeros))
-                    for j in xrange(self.n_cols-n_zeros):
+                    for j in range(self.n_cols-n_zeros):
                         (p, f), rp = self._get_new_col()
                         self.feat_list.append((p, f))
                         self.feat_set.add((p, f))
