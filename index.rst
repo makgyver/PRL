@@ -79,7 +79,7 @@ The meaning of each configuration attribute is described in the following:
 
 - 'iterations': number of iterations of PRL;
 
-- 'solver': the algorithm for solving the game. Up to now the available algorithms are 'FictitiousPlay', 'AMW' and 'LinProg'.
+- 'solver': the algorithm for solving the game. Up to now the available algorithms are 'FictitiousPlay', 'AMW' and 'LinProg';
 
 - 'solver_params': it is the ordered list of parameters of the solver. For more details, please refer to the documentation of the solvers.
 

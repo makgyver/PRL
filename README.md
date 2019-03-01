@@ -53,13 +53,13 @@ The meaning of each configuration attribute is described in the following:
 * `feat_gen_params`: ordered list of parameters for the selected feature generator. For more details, please refer to the documentation of the generators;
 * `pref_generator`: it indicated which preference generator will be used by PRL. The possible preference generation schemes are:
   * `macro`: a macro preference describes preferences like
-    y_i is preferred to `y_j` for the instance `x_i`, where `(x_i, y_i) in X x Y`, while `(x_i, y_j) not in X x Y`. This kind of preferences are suitable for label ranking tasks.
+    y_i is preferred to `y_j` for the instance `x_i`, where `(x_i, y_i) in X x Y`, while `(x_i, y_j) not in X x Y`. This kind of preferences are suitable for label ranking tasks;
   * `micro`: a micro preference describes preferences like
     `(x_i, y_i)` is preferred to `(x_j, y_j)`, where `(x_i, y_i) in X x Y`, while  `(x_j, y_j) not in X x Y`. This kind of preferences are suitable for instance ranking tasks.
 
 * `columns_budget`: the number of columns of the matrix game;
 * `iterations`: number of iterations of PRL;
-* `solver`: the algorithm for solving the game. Up to now the available algorithms are `FictitiousPlay`, `AMW` and `LinProg`.
+* `solver`: the algorithm for solving the game. Up to now the available algorithms are `FictitiousPlay`, `AMW` and `LinProg`;
 * `solver_params`: it is the ordered list of parameters of the solver. For more details, please refer to the documentation of the solvers.
 
 ### Run PRL
