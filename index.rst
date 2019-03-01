@@ -12,12 +12,15 @@ Installing PRL with Pypi (Python 3)
 ===================================
 
 PRL is available in the PyPi repository and it can be installed with
+
 .. code:: sh
+
     pip3 install prl
 
 and then it can be imported in python with
 
 .. code:: python
+
     import prl
 
 How to use the PRL module
@@ -27,9 +30,11 @@ It is possible to run PRL using the provided python script 'run_prl.py'.
 
 Configuration file
 ==================
+
 In order to correctly run the script the configuration file must be initialized. An example of configuration file is provided in 'config/config.json'
 
 .. code:: json
+
     {
         "algorithm" : "PRL",
         "feat_gen" : "GenHPolyF",
@@ -69,7 +74,9 @@ Run PRL
 =======
 
 Once the configuration file is ready, PRL can be trained and evaluated by using the provided script
+
 .. code:: sh
+
     python3 run_prl.py [OPTIONS] dataset
 
 where 'dataset' must be an svmlight file and the possible options are the following:
@@ -80,7 +87,9 @@ where 'dataset' must be an svmlight file and the possible options are the follow
 - '-h', '--help': shows the help.
 
 An example of run, using the configuration file as above, is:
+
 .. code:: sh
+
     python3 run_prl.py -t 0.2 -s 1 -v
 
 which runs PRL using 80% of the dataset as training set and the rest as test set, using 1 as pseudo-random seed and a verbose output.
