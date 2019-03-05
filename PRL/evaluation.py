@@ -10,7 +10,7 @@ def confusion_matrix(prl, gen_pref_test):
     for i in range(N):
         x = X[i,:]
         sco = [0.0 for c in range(prl.dim)]
-        for j, (p, f) in enumerate(prl.feat_list):
+        for j, (p, f) in enumerate(prl.col_list):
             if prl.Q[j] > 0.0:
                 for c in range(prl.dim):
                     if p[0][1] == c:

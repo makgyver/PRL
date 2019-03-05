@@ -16,29 +16,29 @@ from prl.solvers import *
 #LOGGER SETUP
 import logging
 logging.basicConfig(level=logging.INFO,
-					format="[%(asctime)s] %(filename)s - %(message)s",
-					datefmt='%H:%M:%S-%d%m%y')
+                    format="[%(asctime)s] %(filename)s - %(message)s",
+                    datefmt='%H:%M:%S-%d%m%y')
 
 def manage_options():
-	"""Manages the options of the command line.
+    """Manages the options of the command line.
 
-	:returns: a dictionary containg the options and their associated values
-	:rtype: dictionary
-	"""
-	parser = OptionParser(usage="usage: %prog [options] dataset_file", version="%prog 1.0")
+    :returns: a dictionary containg the options and their associated values
+    :rtype: dictionary
+    """
+    parser = OptionParser(usage="usage: %prog [options] dataset_file", version="%prog 1.0")
 
-	parser.add_option("-s", "--seed",           dest="seed",            default=42,      help="Pseudo-random seed for replicability", type="int")
-	parser.add_option("-t", "--test_size",      dest="test_size",       default=.3,      help="Test set size in percentage [0,1]")
-	parser.add_option("-c", "--config_file",    dest="config_file",     default="./config/config.json", help="Configuration file")
-	parser.add_option("-v", "--verbose",        dest="verbose",         default=False,   help="Verbose output", action="store_true")
+    parser.add_option("-s", "--seed",           dest="seed",            default=42,      help="Pseudo-random seed for replicability", type="int")
+    parser.add_option("-t", "--test_size",      dest="test_size",       default=.3,      help="Test set size in percentage [0,1]")
+    parser.add_option("-c", "--config_file",    dest="config_file",     default="./config/config.json", help="Configuration file")
+    parser.add_option("-v", "--verbose",        dest="verbose",         default=False,   help="Verbose output", action="store_true")
 
-	(options, args) = parser.parse_args()
-	if len(args) == 0:
-		parser.error("Wrong arguments")
+    (options, args) = parser.parse_args()
+    if len(args) == 0:
+        parser.error("Wrong arguments")
 
-	out_dict = vars(options)
-	out_dict["dataset"] = args[0]
-	return out_dict
+    out_dict = vars(options)
+    out_dict["dataset"] = args[0]
+    return out_dict
 
 
 #INPUT
@@ -67,30 +67,34 @@ Xte = scaler.transform(Xte)
 
 #LOAD CONFIGURATION FILE
 with open(options['config_file'], "r") as f:
-	data = json.load(f)
-	logging.info("Configuration: %s" %data)
+    data = json.load(f)
+    logging.info("Configuration: %s" %data)
 
-	genf_class = getattr(__import__("prl.genF"), data['feat_gen'])
-	gen_feat = genf_class(Xtr, *data['feat_gen_params'])
+    if "feat_gen" in data:
+        genf_class = getattr(__import__("prl.genF"), data['feat_gen'])
+        gen_col = genf_class(Xtr, *data['feat_gen_params'])
+    else:
+        genk_class = getattr(__import__("prl.genK"), data['kernel_gen'])
+        gen_col = genf_class(*data['kernel_gen_params'])
 
-	if data["pref_generator"] == "micro":
-		gen_pref_training = GenMicroP(Xtr, ytr)
-		gen_pref_test = GenMicroP(Xte, yte)
-	else: #if not micro
-		gen_pref_training = GenMacroP(Xtr, ytr)
-		gen_pref_test = GenMacroP(Xte, yte)
+    if data["pref_generator"] == "micro":
+        gen_pref_training = GenMicroP(Xtr, ytr)
+        gen_pref_test = GenMicroP(Xte, yte)
+    else: #if not micro
+        gen_pref_training = GenMacroP(Xtr, ytr)
+        gen_pref_test = GenMacroP(Xte, yte)
 
-	budget = data["columns_budget"]
-	iterations = data["iterations"]
+    budget = data["columns_budget"]
+    iterations = data["iterations"]
 
-	solver_class = getattr(__import__("prl.solvers"), data['solver'])
-	solver = solver_class(*data['solver_params'])
-	
-	prl_alg = getattr(__import__("prl.prl"), data['algorithm'])
+    solver_class = getattr(__import__("prl.solvers"), data['solver'])
+    solver = solver_class(*data['solver_params'])
+
+    prl_alg = getattr(__import__("prl.prl"), data['algorithm'])
 #
 
 #TRAINING PRL
-prl = prl_alg(gen_pref_training, gen_feat, dim, budget, solver)
+prl = prl_alg(gen_pref_training, gen_col, dim, budget, solver)
 prl.fit(iterations, options["verbose"])
 #
 
@@ -98,8 +102,8 @@ prl.fit(iterations, options["verbose"])
 acc, conf = accuracy(prl, gen_pref_test)
 bacc, _ = balanced_accuracy(prl, gen_pref_test, conf)
 
-logging.info("Accuracy: %.2f" %acc)
-logging.info("Balanced accuracy: %.2f" %bacc)
+logging.info("Accuracy: %.3f" %acc)
+logging.info("Balanced accuracy: %.3f" %bacc)
 logging.info("Confusion matrix:\n%s" %conf)
 #
 
