@@ -13,17 +13,12 @@ def confusion_matrix(prl, gen_pref_test):
         for j, (p, f) in enumerate(prl.col_list):
             if prl.Q[j] > 0.0:
                 for c in range(prl.dim):
-                    if p[0][1] == c:
-                        xp = prl.gen_pref.get_pref_value(p)[0][0]
-                        sco[c] += prl.Q[j]*prl.gen_feat.get_feat_value(f, xp)*prl.gen_feat.get_feat_value(f, x)
-                    if p[1][1] == c:
-                        xn = prl.gen_pref.get_pref_value(p)[1][0]
-                        sco[c] -= prl.Q[j]*prl.gen_feat.get_feat_value(f, xn)*prl.gen_feat.get_feat_value(f, x)
+                    sco[c] += prl.Q[j]*prl.compute_entry(, ((x, c), (-x, c)), f)
+
         y_max = np.argmax(sco)
         conf_mat[y[i], y_max] += 1
 
     return conf_mat
-
 
 def accuracy(prl, gen_pref_test, conf_matrix=None):
     if type(conf_matrix) != np.ndarray:

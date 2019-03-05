@@ -73,9 +73,9 @@ with open(options['config_file'], "r") as f:
     if "feat_gen" in data:
         genf_class = getattr(__import__("prl.genF"), data['feat_gen'])
         gen_col = genf_class(Xtr, *data['feat_gen_params'])
-    else:
+    elif "kernel_gen" in data:
         genk_class = getattr(__import__("prl.genK"), data['kernel_gen'])
-        gen_col = genf_class(*data['kernel_gen_params'])
+        gen_col = genk_class(*data['kernel_gen_params'])
 
     if data["pref_generator"] == "micro":
         gen_pref_training = GenMicroP(Xtr, ytr)

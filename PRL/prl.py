@@ -100,7 +100,17 @@ class PRL:
         return np.dot(R, rq)
 
     def compute_entry(self, p, q, f):
-        return np.dot(self.pref_repr(p, f), self.pref_repr(q, f))
+        rp = np.zeros(self.dim)
+        (x_p, y_p), (x_n, y_n) = p
+        rp[y_p] = +self.gen_feat.get_feat_value(f, x_p)
+        rp[y_n] = -self.gen_feat.get_feat_value(f, x_n)
+
+        rq = np.zeros(self.dim)
+        (x_p, y_p), (x_n, y_n) = q
+        rq[y_p] = +self.gen_feat.get_feat_value(f, x_p)
+        rq[y_n] = -self.gen_feat.get_feat_value(f, x_n)
+
+        return np.dot(rp, rq)
 
     def _get_new_col(self):
         """Internal method that randomly pick a new column in such a way that its representation is not null and it is not already in the game matrix.
@@ -278,10 +288,10 @@ class KPRL:
         """
         p_col = self.gen_pref.get_pref_value(q)
         k_fun = self.gen_kernel.get_kernel_function(k)
-        R = np.zeros((self.n_rows, 1))
+        R = np.zeros(self.n_rows)
         for i, r in enumerate(self.pref_list):
             p_row = self.gen_pref.get_pref_value(r)
-            R[i, 0] = k_fun(p_col, p_row)
+            R[i] = k_fun(p_col, p_row)
 
         return R
 
@@ -332,6 +342,6 @@ class KPRL:
                         self.col_set.add((p, k))
                         self.M[:,j] = self.compute_column(p, k)
             if verbose:
-                logging.info("# of kept columns: %d" %(np.sum(Q>0)))
+                logging.info("# of kept columns: %d\n" %(np.sum(Q>0)))
 
         self.Q = Q
