@@ -89,7 +89,6 @@ class PRL(AbstractPRL):
         self.gen_feat = gen_feat
         self.n_cols = n_cols
         self.dim = dim
-        print(dim)
         self.solver = solver
 
         self.pref_list = self.gen_pref.get_all_prefs()

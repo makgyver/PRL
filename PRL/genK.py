@@ -1,6 +1,8 @@
 import numpy as np
 import random
 
+#TODO documentation
+
 def apply2prefs(k_fun, p1, p2):
     (x1p, y1p), (x1n, y1n) = p1
     (x2p, y2p), (x2n, y2n) = p2
