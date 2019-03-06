@@ -1,7 +1,7 @@
 {
-    "algorithm": "PRL",
-    "feat_gen" : "GenHPolyF",
-    "feat_gen_params" : [3],
+    "algorithm": "KPRL",
+    "kernel_gen" : "GenHPK",
+    "kernel_gen_params" : [1,3],
     "pref_generator" : "macro",
     "columns_budget" : 500,
     "iterations" : 100,

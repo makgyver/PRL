@@ -65,11 +65,9 @@ if options["normalize"] == 1:
     Xtr = scaler.transform(Xtr)
     Xte = scaler.transform(Xte)
 elif options["normalize"] == 2:
-    print("here")
     Xtr = normalize(Xtr)
     Xte = normalize(Xte)
 #
-print(Xtr[0,:])
 
 #LOAD CONFIGURATION FILE
 with open(options['config_file'], "r") as f:

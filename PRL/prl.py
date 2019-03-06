@@ -421,6 +421,13 @@ class KPRL(AbstractPRL):
 
 
     def predict(self, gen_pref_test):
+        """Computes the classification for the given test preferences.
+
+        :param gen_pref_test: test preference generator
+        :type gen_pref_test: object of class which inherits from <:genP.GenP>, e.g., GenMacroP
+        :returns: a vector containing the predictions
+        :rtype: numpy.ndarray
+        """
         X = gen_pref_test.X
         y_pred = []
         for i in range(gen_pref_test.n):
