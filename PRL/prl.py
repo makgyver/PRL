@@ -8,7 +8,71 @@ import logging
 
 __docformat__ = 'reStructuredText'
 
-class PRL:
+class AbstractPRL:
+    """Abstract class which contains the necessary methods for a PRL-based algorithm."""
+
+    def get_random_pair(self):
+        """Returns a new random columns composed by a preference-parameter pair.
+
+        :returns:  a new random columns composed by a preference-parameter pair
+        :rtype: tuple(preference, parameter)
+        """
+        pass
+
+    def compute_column(self, rq, f):
+        """Computes the column representation of the preference q w.r.t. the parameter f.
+
+        :param rq: the new preference representation
+        :param f: the parameter identifier
+        :type rq: numpy.ndarray
+        :type f: int, tuple
+        :returns: the representation of the column
+        :rtype: numpy.ndarray
+        """
+        pass
+
+    def pref_repr(self, p, f):
+        """Computes the representation of the preference q w.r.t. the associated parameter f.
+
+        :param q: the new preference
+        :param f: the associated parameter
+        :type q: tuple
+        :type f: int, tuple
+        :returns: the representation of the preference q w.r.t. f.
+        :rtype: numpy.ndarray
+        """
+        pass
+
+    def _get_new_col(self):
+        """Internal method that randomly pick a new column in such a way that its representation is not null and it is not already in the game matrix.
+
+        :returns: a not null representation of a random picked preference-parameter pair
+        :rtype: tuple
+        """
+        pass
+
+    def fit(self, iterations, verbose):
+        """Trains the PRL method.
+
+        :param iterations: the number of iterations of PRL
+        :param verbose: whether the output is verbose or not
+        :type iterations: int
+        :type verbose: bool
+        """
+        pass
+
+    def predict(self, gen_pref_test):
+        """Computes the classification for the given test preferences.
+
+        :param gen_pref_test: test preference generator
+        :type gen_pref_test: object of class which inherits from <:genP.GenP>, e.g., GenMacroP
+        :returns: a vector containing the predictions
+        :rtype: numpy.ndarray
+        """
+        pass
+
+
+class PRL(AbstractPRL):
     """This class implements the Preference and Rule Learning (PRL) algorithm.
 
     The current implementation of PRL uses a fixed budget of columns and it is
@@ -37,6 +101,7 @@ class PRL:
         self.gen_feat = gen_feat
         self.n_cols = n_cols
         self.dim = dim
+        print(dim)
         self.solver = solver
 
         self.pref_list = self.gen_pref.get_all_prefs()
@@ -99,19 +164,6 @@ class PRL:
 
         return np.dot(R, rq)
 
-    def compute_entry(self, p, q, f):
-        rp = np.zeros(self.dim)
-        (x_p, y_p), (x_n, y_n) = p
-        rp[y_p] = +self.gen_feat.get_feat_value(f, x_p)
-        rp[y_n] = -self.gen_feat.get_feat_value(f, x_n)
-
-        rq = np.zeros(self.dim)
-        (x_p, y_p), (x_n, y_n) = q
-        rq[y_p] = +self.gen_feat.get_feat_value(f, x_p)
-        rq[y_n] = -self.gen_feat.get_feat_value(f, x_n)
-
-        return np.dot(rp, rq)
-
     def _get_new_col(self):
         """Internal method that randomly pick a new column in such a way that its representation is not null and it is not already in the game matrix.
 
@@ -159,7 +211,7 @@ class PRL:
                         self.M[:,j] = self.compute_column(rp, f)
 
             if verbose:
-                logging.info("## of kept columns: %d" %(np.sum(Q>0)))
+                logging.info("# of kept columns: %d" %(np.sum(Q>0)))
                 logging.info("# of unique features: %d\n" %len(set([f for i, (p, f) in enumerate(self.col_list) if Q[i]>0.])))
         self.Q = Q
 
@@ -174,10 +226,33 @@ class PRL:
         """
         list_w_feat = [(self.Q[i], pf) for i, pf in enumerate(self.col_list) if self.Q[i] > 0]
         list_w_feat.sort(reverse=True)
-
         return [(pf, q) for (q, pf) in list_w_feat[:k]]
 
 
+    def predict(self, gen_pref_test):
+        """Computes the classification for the given test preferences.
+
+        :param gen_pref_test: test preference generator
+        :type gen_pref_test: object of class which inherits from <:genP.GenP>, e.g., GenMacroP
+        :returns: a vector containing the predictions
+        :rtype: numpy.ndarray
+        """
+        X = gen_pref_test.X
+        y_pred = []
+        for i in range(gen_pref_test.n):
+            x = X[i,:]
+            sco = [0.0 for c in range(self.dim)]
+            for j, (p, f) in enumerate(self.col_list):
+                if self.Q[j] > 0.0:
+                    for c in range(self.dim):
+                        rp = self.pref_repr(p, f)
+                        rq = np.zeros(self.dim)
+                        rq[c] = +self.gen_feat.get_feat_value(f, x)
+                        sco[c] += self.Q[j]*np.dot(rp, rq)
+
+            y_pred.append(np.argmax(sco))
+        print(y_pred)
+        return np.array(y_pred)
 
 
 
@@ -216,7 +291,7 @@ class PRL_ext(PRL):
                         (p, f), rp = self._get_new_col()
                         self.col_list.append((p, f))
                         self.col_set.add((p, f))
-                        self.M[:,j] = self.compute_column(rp, f)
+                        M_r[:,j] = self.compute_column(rp, f)
 
                     self.M = np.concatenate((self.M, M_r), axis=1)
 
@@ -228,7 +303,7 @@ class PRL_ext(PRL):
         self.Q = Q
 
 
-class KPRL:
+class KPRL(AbstractPRL):
     """This class implements the Kernelized Preference and Rule Learning (KPRL) algorithm."""
 
     def __init__(self, gen_pref, gen_kernel, dim, n_cols, solver):
@@ -295,9 +370,6 @@ class KPRL:
 
         return R
 
-    def compute_entry(self, p, q, k):
-        return self.gen_kernel.get_kernel_function(k)(p, q)
-
     def _get_new_col(self):
         """Internal method that randomly pick a new column in such a way that its representation is not null and it is not already in the game matrix.
 
@@ -345,3 +417,27 @@ class KPRL:
                 logging.info("# of kept columns: %d\n" %(np.sum(Q>0)))
 
         self.Q = Q
+
+
+    def predict(self, gen_pref_test):
+        """Computes the classification for the given test preferences.
+
+        :param gen_pref_test: test preference generator
+        :type gen_pref_test: object of class which inherits from <:genP.GenP>, e.g., GenMacroP
+        :returns: a vector containing the predictions
+        :rtype: numpy.ndarray
+        """
+        X = gen_pref_test.X
+        y_pred = []
+        for i in range(gen_pref_test.n):
+            x = X[i,:]
+            sco = [0.0 for c in range(self.dim)]
+            for j, (p, k) in enumerate(self.col_list):
+                if self.Q[j] > 0.0:
+                    for c in range(self.dim):
+                        rp = self.gen_pref.get_pref_value(p)
+                        rq = ((x,c), (-x,c))
+                        sco[c] += self.Q[j]*self.gen_kernel.get_kernel_function(k)(rp, rq)
+            y_pred.append(np.argmax(sco))
+
+        return np.array(y_pred)

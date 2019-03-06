@@ -7,12 +7,13 @@ def apply2prefs(k_fun, p1, p2):
     res = 0.
     if y1p == y2p:
         res += k_fun(x1p, x2p)
-        if y1n == y2n:
-            res += k_fun(x1n, x2n)
-    elif y1p == y2n:
+    if y1n == y2n:
+        res += k_fun(x1n, x2n)
+    if y1p == y2n:
         res -= k_fun(x1p, x2n)
-        if y1n == y2p:
-            res -= k_fun(x1n, x2p)
+    if y1n == y2p:
+        res -= k_fun(x1n, x2p)
+
     return res
 
 
