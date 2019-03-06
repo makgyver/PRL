@@ -242,16 +242,17 @@ class PRL(AbstractPRL):
         for i in range(gen_pref_test.n):
             x = X[i,:]
             sco = [0.0 for c in range(self.dim)]
-            for j, (p, f) in enumerate(self.col_list):
+            for j, (p, k) in enumerate(self.col_list):
                 if self.Q[j] > 0.0:
                     for c in range(self.dim):
-                        rp = self.pref_repr(p, f)
-                        rq = np.zeros(self.dim)
-                        rq[c] = +self.gen_feat.get_feat_value(f, x)
-                        sco[c] += self.Q[j]*np.dot(rp, rq)
-
+                        if p[0][1] == c:
+                            xp = self.gen_pref.get_pref_value(p)[0][0]
+                            sco[c] += self.Q[j]*self.gen_feat.get_feat_value(f, xp)*self.gen_feat.get_feat_value(f, x)
+                        if p[1][1] == c:
+                            xn = self.gen_pref.get_pref_value(p)[1][0]
+                            sco[c] -= self.Q[j]*self.gen_feat.get_feat_value(f, xn)*self.gen_feat.get_feat_value(f, x)
             y_pred.append(np.argmax(sco))
-        print(y_pred)
+
         return np.array(y_pred)
 
 
@@ -362,7 +363,7 @@ class KPRL(AbstractPRL):
         :rtype: numpy.ndarray
         """
         p_col = self.gen_pref.get_pref_value(q)
-        k_fun = self.gen_kernel.get_kernel_function(k)
+        k_fun = self.gen_kernel.get_pref_kernel_function(k)
         R = np.zeros(self.n_rows)
         for i, r in enumerate(self.pref_list):
             p_row = self.gen_pref.get_pref_value(r)
@@ -420,13 +421,6 @@ class KPRL(AbstractPRL):
 
 
     def predict(self, gen_pref_test):
-        """Computes the classification for the given test preferences.
-
-        :param gen_pref_test: test preference generator
-        :type gen_pref_test: object of class which inherits from <:genP.GenP>, e.g., GenMacroP
-        :returns: a vector containing the predictions
-        :rtype: numpy.ndarray
-        """
         X = gen_pref_test.X
         y_pred = []
         for i in range(gen_pref_test.n):
@@ -435,9 +429,12 @@ class KPRL(AbstractPRL):
             for j, (p, k) in enumerate(self.col_list):
                 if self.Q[j] > 0.0:
                     for c in range(self.dim):
-                        rp = self.gen_pref.get_pref_value(p)
-                        rq = ((x,c), (-x,c))
-                        sco[c] += self.Q[j]*self.gen_kernel.get_kernel_function(k)(rp, rq)
+                        if p[0][1] == c:
+                            xp = self.gen_pref.get_pref_value(p)[0][0]
+                            sco[c] += self.Q[j]*self.gen_kernel.get_kernel_function(k)(xp, x)
+                        if p[1][1] == c:
+                            xn = self.gen_pref.get_pref_value(p)[1][0]
+                            sco[c] -= self.Q[j]*self.gen_kernel.get_kernel_function(k)(xn, x)
             y_pred.append(np.argmax(sco))
 
         return np.array(y_pred)
