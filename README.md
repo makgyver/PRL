@@ -41,7 +41,9 @@ In order to correctly run the script the configuration file must be initialized.
 The meaning of each configuration attribute is described in the following:
 * `algorithm`: it selects the PRL variation. Actually two PRL variations are implemented:
   * `PRL`: which is the standard algorithm as presented in the paper mentioned above;
-  * `PRL_ext`: that is slight different from PRL, in the sense that the budget of columns is not fixed, but at each iterations `columns_budget` number of new columns are generated. This variation guarantees that regardless of the initial budget at some iteration the number of columns will be enough to guarantee the convergence to the optimum (as the number of iterations increases).
+  * `PRL_ext`: that is slight different from PRL, in the sense that the budget of columns is not fixed, but at each iterations `columns_budget` number of new columns are generated. This variation guarantees that regardless of the initial budget at some iteration the number of columns will be enough to guarantee the convergence to the optimum (as the number of iterations increases);
+  * `KPRL`: which is similar to the standard PRL but instead of generating preference-feature pairs as columns, it generates preference-kernel pairs.
+  
 * `feat_gen`: it indicates which feature generator will be used by PRL. Feature generators are implemented in the script `genF.py` and at the moment the following feature generators scheme are implemented:
   * `GenLinF`: generates linear features, i.e., it randomly picks a feature from the input ones;
   * `GenHPolyF`: generates homogeneous polynomial features of the specified degree;
