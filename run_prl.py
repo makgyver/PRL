@@ -5,7 +5,7 @@ from optparse import OptionParser
 
 from sklearn.datasets import load_svmlight_file
 from sklearn.model_selection import train_test_split
-from sklearn.preprocessing import MinMaxScaler
+from sklearn.preprocessing import MinMaxScaler, normalize
 
 from prl.prl import *
 from prl.genF import *
@@ -29,6 +29,7 @@ def manage_options():
 
     parser.add_option("-s", "--seed",           dest="seed",            default=42,      help="Pseudo-random seed for replicability", type="int")
     parser.add_option("-t", "--test_size",      dest="test_size",       default=.3,      help="Test set size in percentage [0,1]")
+    parser.add_option("-n", "--normalize",      dest="normalize",       default=1,      help="Whether the instances has to be normalized or not (default:1) - 0:No, 1:MinMax standardization, 2:L2 normalization", type="int")
     parser.add_option("-c", "--config_file",    dest="config_file",     default="./config/config.json", help="Configuration file")
     parser.add_option("-v", "--verbose",        dest="verbose",         default=False,   help="Verbose output", action="store_true")
 
@@ -39,7 +40,6 @@ def manage_options():
     out_dict = vars(options)
     out_dict["dataset"] = args[0]
     return out_dict
-
 
 #INPUT
 options = manage_options()
@@ -59,11 +59,17 @@ y = np.array([map_y[i] for i in y])
 #TRAINING-TEST SET SPLIT
 Xtr, Xte, ytr, yte = train_test_split(X, y, test_size=options["test_size"], random_state=options["seed"])
 
-scaler = MinMaxScaler()
-scaler.fit(Xtr)
-Xtr = scaler.transform(Xtr)
-Xte = scaler.transform(Xte)
+if options["normalize"] == 1:
+    scaler = MinMaxScaler()
+    scaler.fit(Xtr)
+    Xtr = scaler.transform(Xtr)
+    Xte = scaler.transform(Xte)
+elif options["normalize"] == 2:
+    print("here")
+    Xtr = normalize(Xtr)
+    Xte = normalize(Xte)
 #
+print(Xtr[0,:])
 
 #LOAD CONFIGURATION FILE
 with open(options['config_file'], "r") as f:
