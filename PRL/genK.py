@@ -35,17 +35,18 @@ class GenKList(GenK):
     def __init__(self, k_list):
         self.kernel_list = k_list
 
+    def __repr__(self):
+        return "GenKList(n_kernel=%d)" %len(self.kernel_list)
+
     def get_random_kernel(self):
         return random.randint(0, len(self.kernel_list)-1)
 
     def get_pref_kernel_function(self, d):
-        return lambda p1, p2: apply2prefs(self.kernel_list[d], p1, p2)
+        return lambda p1, p2: apply2prefs(self.get_kernel_function(d), p1, p2)
 
     def get_kernel_function(self, d):
         return self.kernel_list[d]
 
-    def __repr__(self):
-        return "GenKList"
 
 
 class GenHPK(GenK):
@@ -53,14 +54,14 @@ class GenHPK(GenK):
         self.min_deg = min_deg
         self.max_deg = max(max_deg, min_deg)
 
-    def get_random_kernel(self):
-        return random.randint(self.min_deg, self.max_deg)
-
     def __repr__(self):
         return "GenHPK(dmin=%d, dmax=%d)" %(self.min_deg, self.max_deg)
 
+    def get_random_kernel(self):
+        return random.randint(self.min_deg, self.max_deg)
+
     def get_pref_kernel_function(self, d):
-        return lambda p1, p2: apply2prefs(lambda x,z: np.dot(x,z)**d, p1, p2)
+        return lambda p1, p2: apply2prefs(self.get_kernel_function(d), p1, p2)
 
     def get_kernel_function(self, d):
         return lambda x,z: np.dot(x,z)**d

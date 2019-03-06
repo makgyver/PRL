@@ -8,6 +8,7 @@ def confusion_matrix(prl, gen_pref_test):
         conf_mat[y[i], y_max] += 1
     return conf_mat
 
+
 def accuracy(prl, gen_pref_test, conf_matrix=None):
     if type(conf_matrix) != np.ndarray:
         conf_matrix = confusion_matrix(prl, gen_pref_test)
