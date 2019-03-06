@@ -43,7 +43,7 @@ The meaning of each configuration attribute is described in the following:
   * `PRL`: which is the standard algorithm as presented in the paper mentioned above;
   * `PRL_ext`: that is slight different from PRL, in the sense that the budget of columns is not fixed, but at each iterations `columns_budget` number of new columns are generated. This variation guarantees that regardless of the initial budget at some iteration the number of columns will be enough to guarantee the convergence to the optimum (as the number of iterations increases).
 * `feat_gen`: it indicates which feature generator will be used by PRL. Feature generators are implemented in the script `genF.py` and at the moment the following feature generators scheme are implemented:
-  * `GenLinF`: generates linear features, i.e., it randomly pick a feature from the input ones;
+  * `GenLinF`: generates linear features, i.e., it randomly picks a feature from the input ones;
   * `GenHPolyF`: generates homogeneous polynomial features of the specified degree;
   * `GenDPKF`: generates dot-product polynomials features of the specified degree. It mainly differs from `GenHPolyF` on the weighting scheme of the features;
   * `GenConjF`: it assumes binary/boolean input vectors and it generates conjunctive (logical AND) features of the specified arity;
@@ -51,6 +51,12 @@ The meaning of each configuration attribute is described in the following:
   * `GenRuleEqF`: like `GenRuleF`, but the only relation considered is the equality (`==`).
 
 * `feat_gen_params`: ordered list of parameters for the selected feature generator. For more details, please refer to the documentation of the generators;
+
+* `kernel_gen`: (Only for KPRL) it indicates which kernel generator will be used by KPRL. Kernel generators are implemented in the script `genK.py` and at the moment the following kernel generators scheme are implemented:
+  * `GenKList`: generates a kernel from the provided list of kernel functions, i.e., it randomly picks a kernel from the provided list;
+  * `GenHPK`: generates an homogeneous polynomial kernel function of one of the specified degrees;
+
+* `kernel_gen_params`: (Only for KPRL) ordered list of parameters for the selected kernel generator. For more details, please refer to the documentation of the generators;
 * `pref_generator`: it indicated which preference generator will be used by PRL. The possible preference generation schemes are:
   * `macro`: a macro preference describes preferences like
     y_i is preferred to `y_j` for the instance `x_i`, where `(x_i, y_i) in X x Y`, while `(x_i, y_j) not in X x Y`. This kind of preferences are suitable for label ranking tasks;
@@ -62,6 +68,8 @@ The meaning of each configuration attribute is described in the following:
 * `solver`: the algorithm for solving the game. Up to now the available algorithms are `FictitiousPlay`, `AMW` and `LinProg`;
 * `solver_params`: it is the ordered list of parameters of the solver. For more details, please refer to the documentation of the solvers.
 
+Inside the `config` folder an example of configuration file which uses `KPRL` is also provided.
+
 ### Run PRL
 Once the configuration file is ready, PRL can be trained and evaluated by using the provided script
 ```sh
@@ -70,13 +78,14 @@ python run_prl.py [OPTIONS] dataset
 where `dataset` must be an svmlight file and the possible options are the following:
 * `-c CONFIG_FILE`, `--config_file CONFIG_FILE`: `CONFIG_FILE` specifies the path of the configuration file (default: `config/config.json`);
 * `-t SIZE`, `--test_size SIZE`: `SIZE` specifies the portion (in percentage, float between 0 and 1) of the dataset will be used as test set (default: 0.3);
+* `-n NORM`, `--normalize NORM`: `NORM` specifies the type of data normalization - {0:None, 1:Min-Max scaling, 2:L2 normalization} (default: 1)
 * `-s SEED`, `--seed SEED`: ``SEED`` specifies the pseudo-random seed. Useful for replicability purposes (default: 42);
 * `-v`, `--verbose`: whether the output it is verbose or not;
 * `-h`, `--help`: shows the help.
 
 An example of run, using the configuration file as above, is:
 ```sh
-python run_prl.py -t 0.2 -s 1 -v
+python3 run_prl.py -t 0.2 -s 1 -v
 ```
 which runs PRL using 80% of the dataset as training set and the rest as test set, using 1 as pseudo-random seed and a verbose output.
 
