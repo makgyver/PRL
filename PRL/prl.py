@@ -1,6 +1,7 @@
 import math
 import numpy as np
 
+from .genK import *
 from .genF import *
 from .genP import *
 
@@ -205,7 +206,7 @@ class PRL(AbstractPRL):
         for i in range(gen_pref_test.n):
             x = X[i,:]
             sco = [0.0 for c in range(self.dim)]
-            for j, (p, k) in enumerate(self.col_list):
+            for j, (p, f) in enumerate(self.col_list):
                 if self.Q[j] > 0.0:
                     for c in range(self.dim):
                         if p[0][1] == c:
