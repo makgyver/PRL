@@ -98,3 +98,24 @@ class GenMacroP(GenP):
 
     def __repr__(self):
         return "Micro preference generator"
+
+
+class GenIP(GenP):
+    """Instance-based preference generator. These are actually degenerate preferences that are
+    simple instances."""
+
+    def __init__(self, X):
+        self.X = X
+        self.n = X.shape[0]
+
+    def get_random_pref(self):
+        return random.randint(0, self.n-1)
+
+    def get_pref_value(self, p):
+        return self.X[p]
+
+    def get_all_prefs(self):
+        return range(self.n)
+
+    def __repr__(self):
+        return "Instance-based preference generator"

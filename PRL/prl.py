@@ -384,3 +384,73 @@ class KPRL(AbstractPRL):
             y_pred.append(np.argmax(sco))
 
         return np.array(y_pred)
+
+
+class IBPRL(PRL):
+
+    def __init__(self, X, gen_feat, n_cols, solver):
+        super(IBPRL, self).__init__(self, GenIP(X), gen_feat, 1, n_cols, solver)
+
+    def __repr__(self):
+        return "IBPRL(gen_pref=%s, gen_feat=%s, n_rows=%d, n_cols=%d, solver=%s)"\
+            %(self.gen_pref, self.gen_feat, self.n_rows, self.n_cols, self.solver)
+
+    def compute_column(self, iqx, f):
+        qx = self.gen_pref.get_pref_value(iqx)
+        R = np.zeros((self.n_rows, 1))
+        for i, ipx in enumerate(self.pref_list):
+            R[i, 0] = self.gen_feat.get_feat_value(f, self.gen_pref.get_pref_value(ipx))
+
+        return R*qx
+
+    def get_new_col(self):
+        (ix, f) = self.get_random_pair()
+        while (ix, f) in self.col_set:
+            (ix, f) = self.get_random_pair()
+        return (ix, f)
+
+
+    def fit(self, iterations=1000, verbose=False):
+        if verbose:
+            logging.info("Starting training of %s" %self)
+            logging.info("Matrix game initialization...")
+
+        for j in range(self.n_cols):
+            (ix, f) = self.get_new_col()
+            self.col_list.append((ix, f))
+            self.col_set.add((ix, f))
+            self.M[:,j] = self.compute_column(ix, f)
+
+        #iterative updates
+        for t in range(iterations):
+            if verbose: logging.info("IBPRL iteration %d/%d" %(t+1, iterations))
+            (P, Q, V) = self.solver.solve(self.M, self.n_rows, self.n_cols)
+            if verbose: logging.info("Value of the game (current margin): %.6f" %V)
+            if (t+1 < iterations):
+                for j in range(self.n_cols):
+                    if Q[j] <= 0:
+                        (ix, f) = self.get_new_col()
+                        self.col_set.remove(self.col_list[j])
+                        self.col_list[j] = (ix, f)
+                        self.col_set.add((ix, f))
+                        self.M[:,j] = self.compute_column(ix, f)
+
+            if verbose:
+                logging.info("# of kept columns: %d" %(np.sum(Q>0)))
+                logging.info("# of unique features: %d\n" %len(set([f for i, (ix, f) in enumerate(self.col_list) if Q[i]>0.])))
+        self.Q = Q
+
+
+    def predict(self, gen_pref_test):
+        X = gen_pref_test.X
+        y_pred = []
+        for i in range(gen_pref_test.n):
+            x = X[i,:]
+            y = 0
+            for j, (ix, f) in enumerate(self.col_list):
+                if self.Q[j] > 0.0:
+                    xp = self.gen_pref.get_pref_value(ix)
+                    y += self.Q[j]*self.gen_feat.get_feat_value(f, xp)*self.gen_feat.get_feat_value(f, x)
+            y_pred.append(y)
+
+        return np.array(y_pred)

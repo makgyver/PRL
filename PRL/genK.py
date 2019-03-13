@@ -1,5 +1,6 @@
 import numpy as np
 import random
+import math
 
 #TODO documentation
 
@@ -50,7 +51,6 @@ class GenKList(GenK):
         return self.kernel_list[d]
 
 
-
 class GenHPK(GenK):
     def __init__(self, min_deg=2, max_deg=2):
         self.min_deg = min_deg
@@ -62,8 +62,26 @@ class GenHPK(GenK):
     def get_random_kernel(self):
         return random.randint(self.min_deg, self.max_deg)
 
-    def get_pref_kernel_function(self, d):
-        return lambda p1, p2: apply2prefs(self.get_kernel_function(d), p1, p2)
+    def get_pref_kernel_function(self, degree):
+        return lambda p1, p2: apply2prefs(self.get_kernel_function(degree), p1, p2)
 
-    def get_kernel_function(self, d):
-        return lambda x,z: np.dot(x,z)**d
+    def get_kernel_function(self, degree):
+        return lambda x,z: np.dot(x,z)**degree
+
+
+class GenRBFK(GenKList):
+    def __init__(self, gamma_range):
+        self.gamma_range = gamma_range
+
+    def __repr__(self):
+        return "GenRBFK(gamma_range=%s)" %(self.gamma_range)
+
+    def get_random_kernel(self):
+        return random.choice(self.gamma_range)
+
+    def get_pref_kernel_function(self, gamma):
+        return lambda p1, p2: apply2prefs(self.get_kernel_function(gamma), p1, p2)
+
+    def get_kernel_function(self, gamma):
+        return lambda x,z: math.exp(-gamma * np.linalg.norm(x-z)**2)
+        #return lambda x,z: math.exp(-gamma * np.sum((x-z)**2))
