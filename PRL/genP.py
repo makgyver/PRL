@@ -1,7 +1,7 @@
 import numpy as np
 import random
 
-class GenP():
+class GenP(object):
     """Abstract class which representes a generic preference generator.
     Every specific generator MUST inherit from this class."""
 

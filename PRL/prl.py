@@ -9,7 +9,7 @@ import logging
 
 __docformat__ = 'reStructuredText'
 
-class AbstractPRL:
+class AbstractPRL(object):
     """Abstract class which contains the necessary methods for a PRL-based algorithm."""
 
     def get_random_pair(self):

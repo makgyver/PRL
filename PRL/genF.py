@@ -2,7 +2,7 @@ import numpy as np
 import random, math
 from scipy.special import binom
 
-class GenF():
+class GenF(object):
     def __init__(self):
         pass
 
